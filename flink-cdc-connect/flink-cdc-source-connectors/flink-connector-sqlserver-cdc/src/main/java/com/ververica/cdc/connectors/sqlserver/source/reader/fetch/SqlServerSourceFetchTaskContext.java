@@ -62,7 +62,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
+
+import static io.debezium.connector.sqlserver.SourceInfo.CHANGE_LSN_KEY;
+import static io.debezium.connector.sqlserver.SourceInfo.COMMIT_LSN_KEY;
+import static io.debezium.connector.sqlserver.SourceInfo.EVENT_SERIAL_NO_KEY;
 
 /** The context for fetch task that fetching data of snapshot split from SqlServer data source. */
 public class SqlServerSourceFetchTaskContext extends JdbcSourceFetchTaskContext {
@@ -151,7 +156,19 @@ public class SqlServerSourceFetchTaskContext extends JdbcSourceFetchTaskContext 
                         connectorConfig.getTableFilters().dataCollectionFilter(),
                         DataChangeEvent::new,
                         metadataProvider,
-                        schemaNameAdjuster);
+                        schemaNameAdjuster,
+                        // https://debezium.io/documentation/reference/stable/connectors/oracle.html#oracle-schema-change-topic
+                        event -> {
+                            Map<String, Object> source = new HashMap<>();
+                            Struct sourceInfo = event.getSource();
+                            String changeLsn = sourceInfo.getString(CHANGE_LSN_KEY);
+                            String commitLsn = sourceInfo.getString(COMMIT_LSN_KEY);
+                            String eventSerialNo = sourceInfo.getString(EVENT_SERIAL_NO_KEY);
+                            source.put(CHANGE_LSN_KEY, changeLsn);
+                            source.put(COMMIT_LSN_KEY, commitLsn);
+                            source.put(EVENT_SERIAL_NO_KEY, eventSerialNo);
+                            return source;
+                        });
 
         this.snapshotReceiver = dispatcher.getSnapshotChangeEventReceiver();
 
@@ -299,8 +316,8 @@ public class SqlServerSourceFetchTaskContext extends JdbcSourceFetchTaskContext 
                 return null;
             }
             return Collect.hashMapOf(
-                    SourceInfo.COMMIT_LSN_KEY, sourceInfo.getString(SourceInfo.COMMIT_LSN_KEY),
-                    SourceInfo.CHANGE_LSN_KEY, sourceInfo.getString(SourceInfo.CHANGE_LSN_KEY));
+                    COMMIT_LSN_KEY, sourceInfo.getString(COMMIT_LSN_KEY),
+                    CHANGE_LSN_KEY, sourceInfo.getString(CHANGE_LSN_KEY));
         }
 
         @Override
@@ -313,7 +330,7 @@ public class SqlServerSourceFetchTaskContext extends JdbcSourceFetchTaskContext 
             if (source == null) {
                 return null;
             }
-            return sourceInfo.getString(SourceInfo.COMMIT_LSN_KEY);
+            return sourceInfo.getString(COMMIT_LSN_KEY);
         }
     }
 }
