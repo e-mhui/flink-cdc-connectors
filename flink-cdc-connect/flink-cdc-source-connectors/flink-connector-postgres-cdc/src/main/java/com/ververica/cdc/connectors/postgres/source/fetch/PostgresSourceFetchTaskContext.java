@@ -63,6 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static io.debezium.connector.AbstractSourceInfo.SCHEMA_NAME_KEY;
@@ -223,7 +224,8 @@ public class PostgresSourceFetchTaskContext extends JdbcSourceFetchTaskContext {
                         dbzConfig.getTableFilters().dataCollectionFilter(),
                         DataChangeEvent::new,
                         metadataProvider,
-                        schemaNameAdjuster);
+                        schemaNameAdjuster,
+                        event -> new HashMap<>());
 
         this.postgresDispatcher =
                 new PostgresEventDispatcher<>(
