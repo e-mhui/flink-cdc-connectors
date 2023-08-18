@@ -27,6 +27,7 @@ import com.ververica.cdc.connectors.base.source.meta.split.SourceSplitBase;
 import com.ververica.cdc.connectors.base.source.reader.external.JdbcSourceFetchTaskContext;
 import com.ververica.cdc.connectors.postgres.source.PostgresDialect;
 import com.ververica.cdc.connectors.postgres.source.config.PostgresSourceConfig;
+import com.ververica.cdc.connectors.postgres.source.handler.PostgresSchemaChangeEventHandler;
 import com.ververica.cdc.connectors.postgres.source.offset.PostgresOffset;
 import com.ververica.cdc.connectors.postgres.source.offset.PostgresOffsetFactory;
 import com.ververica.cdc.connectors.postgres.source.offset.PostgresOffsetUtils;
@@ -63,7 +64,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static io.debezium.connector.AbstractSourceInfo.SCHEMA_NAME_KEY;
@@ -225,7 +225,7 @@ public class PostgresSourceFetchTaskContext extends JdbcSourceFetchTaskContext {
                         DataChangeEvent::new,
                         metadataProvider,
                         schemaNameAdjuster,
-                        event -> new HashMap<>());
+                        new PostgresSchemaChangeEventHandler());
 
         this.postgresDispatcher =
                 new PostgresEventDispatcher<>(
