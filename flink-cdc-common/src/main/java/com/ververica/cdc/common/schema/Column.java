@@ -16,8 +16,7 @@
 
 package com.ververica.cdc.common.schema;
 
-import org.apache.flink.annotation.PublicEvolving;
-
+import com.ververica.cdc.common.annotation.PublicEvolving;
 import com.ververica.cdc.common.types.DataType;
 
 import javax.annotation.Nullable;
@@ -62,6 +61,11 @@ public abstract class Column implements Serializable {
     /** Returns the data type of this column. */
     public DataType getType() {
         return type;
+    }
+
+    @Nullable
+    public String getComment() {
+        return comment;
     }
 
     /** Returns a string that summarizes this column for printing to a console. */

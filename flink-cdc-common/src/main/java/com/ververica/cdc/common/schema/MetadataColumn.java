@@ -16,8 +16,7 @@
 
 package com.ververica.cdc.common.schema;
 
-import org.apache.flink.annotation.PublicEvolving;
-
+import com.ververica.cdc.common.annotation.PublicEvolving;
 import com.ververica.cdc.common.types.DataType;
 
 import javax.annotation.Nullable;
@@ -41,6 +40,11 @@ public class MetadataColumn extends Column {
     @Override
     public boolean isPhysical() {
         return false;
+    }
+
+    @Nullable
+    public String getMetadataKey() {
+        return metadataKey;
     }
 
     @Override

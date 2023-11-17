@@ -22,5 +22,16 @@ import com.ververica.cdc.runtime.operators.schema.coordinator.SchemaOperatorCoor
 
 /** A {@link OperatorEvent} that register sink writer to {@link SchemaOperatorCoordinator}. */
 public class SinkWriterRegisterEvent implements OperatorEvent {
+
     private static final long serialVersionUID = 1L;
+
+    private final int subtask;
+
+    public SinkWriterRegisterEvent(int subtask) {
+        this.subtask = subtask;
+    }
+
+    public int getSubtask() {
+        return subtask;
+    }
 }
